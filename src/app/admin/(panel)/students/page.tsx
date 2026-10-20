@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { asc, ilike, or } from "drizzle-orm";
-import { buttonClass, Card, Input, Skeleton } from "@/components/ui";
+import { Search, UserPlus, Users } from "lucide-react";
+import { buttonClass, Card, EmptyState, Input, PageHeader, Skeleton } from "@/components/ui";
 import { db, schema } from "@/db";
 import { requireAdmin } from "@/lib/auth";
 import { formatPhone } from "@/lib/phone";
@@ -12,12 +13,17 @@ export const metadata: Metadata = { title: "Students" };
 export default function StudentsPage(props: PageProps<"/admin/students">) {
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Students</h1>
-        <Link href="/admin/students/new" className={buttonClass()}>
-          + Add student
-        </Link>
-      </div>
+      <PageHeader
+        icon={Users}
+        title="Students"
+        description="Registered residents, their photos, linked phones and face registration."
+        actions={
+          <Link href="/admin/students/new" className={buttonClass()}>
+            <UserPlus aria-hidden className="h-4 w-4" />
+            Add student
+          </Link>
+        }
+      />
       <Suspense fallback={<Skeleton className="h-64 w-full" />}>
         <StudentList searchParams={props.searchParams} />
       </Suspense>
@@ -54,14 +60,14 @@ async function StudentList({ searchParams }: Pick<PageProps<"/admin/students">, 
   return (
     <Card className="space-y-4">
       <form className="flex gap-2">
-        <Input name="q" defaultValue={query} placeholder="Search by name or phone" className="max-w-sm" />
+        <Input name="q" type="search" aria-label="Search students" defaultValue={query} placeholder="Search by name or phone" className="max-w-sm" />
         <button className={buttonClass("secondary")}>Search</button>
       </form>
 
       {rows.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted">
+        <EmptyState icon={query ? Search : Users}>
           {query ? "No students match your search." : "No students yet. Add your first student."}
-        </p>
+        </EmptyState>
       ) : (
         <ul className="divide-y divide-border">
           {rows.map((s) => (

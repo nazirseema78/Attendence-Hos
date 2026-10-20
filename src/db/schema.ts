@@ -84,6 +84,18 @@ export const settings = pgTable("settings", {
   graceMinutes: integer("grace_minutes").notNull().default(30),
 });
 
+/** Single-row (id = 1) institution branding shown across the app. Not a tenant boundary. */
+export const branding = pgTable("branding", {
+  id: integer("id").primaryKey().default(1),
+  orgName: text("org_name").notNull(),
+  /** #RRGGBB; validated for contrast against white before saving. */
+  primaryColor: text("primary_color").notNull(),
+  /** Cloudinary public_id of the logo (server-normalised PNG). */
+  logoId: text("logo_id"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedByAdminId: uuid("updated_by_admin_id").references(() => admins.id),
+});
+
 /** Building network allowlist: single IPs or CIDR ranges, IPv4 or IPv6. */
 export const allowedIps = pgTable("allowed_ips", {
   id: serial("id").primaryKey(),

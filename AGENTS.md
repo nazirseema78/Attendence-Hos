@@ -122,7 +122,16 @@ Env vars: `.env.example` is the committed template and holds **no values**. Real
 - `src/app/api/cron/purge-selfies`: daily Vercel Cron (`vercel.json`), protected by `CRON_SECRET`.
 - `src/db/schema.ts` + `drizzle/`: schema and generated migrations. `scripts/setup.ts`: setup and seeding.
 
+## UI and branding
+
+- Design tokens live in `src/app/globals.css` (navy `#0F172A`, background `#F8FAFC`, white cards). Use the shared components in `src/components/ui.tsx` (`PageHeader`, `Card`, `Button`, `Field`, `Alert`, `StatusBadge`, `EmptyState`) and `lucide-react` icons; don't add another UI kit.
+- Statuses always show colour **and** text (and an icon), never colour alone.
+- Admin shell: Navy sidebar on desktop (`lg:`), top bar + bottom tab bar on mobile/tablet (`src/app/admin/(panel)/admin-nav.tsx`). The four sections are Today, Students, History and Settings.
+- Branding (`branding` table, single row) = institution name, primary colour (validated: contrast ≥ 4.5:1 with white) and logo (re-encoded PNG, served publicly at `/api/branding/logo`). `getBranding()` is `use cache` + `cacheTag("branding")` + `cacheLife("minutes")`; saving calls `updateTag`. It is **not** multi-tenancy: one deployment = one institution's data.
+
 ## Next.js 16 gotchas hit in this repo
+
+- Client components that read the URL (`usePathname`) must sit inside `<Suspense>` on dynamic routes; the nav uses a static fallback.
 
 - Cache Components is on. Anything that reads cookies, headers or the DB goes inside `<Suspense>`: each page is a static shell plus an async content component.
 - `new Date()` during a prerender is an error. `sessionTokenHash` in `src/lib/auth.ts` calls `connection()` first, so all session-dependent code runs at request time.

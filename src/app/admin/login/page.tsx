@@ -1,28 +1,21 @@
-"use client";
+import type { Metadata } from "next";
+import { BrandMark } from "@/components/brand";
+import { Card } from "@/components/ui";
+import { getBranding } from "@/lib/branding";
+import { AdminLoginForm } from "./login-form";
 
-import { useActionState } from "react";
-import { Alert, Button, Card, Field, Input } from "@/components/ui";
-import { adminLogin, type AdminLoginState } from "./actions";
+export const metadata: Metadata = { title: "Admin login" };
 
-export default function AdminLoginPage() {
-  const [state, action, pending] = useActionState<AdminLoginState, FormData>(adminLogin, {});
-
+export default async function AdminLoginPage() {
+  const brand = await getBranding();
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-10">
-      <h1 className="mb-6 text-2xl font-semibold">Admin login</h1>
+    <main id="main" className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-10">
+      <div className="mb-8 flex justify-center">
+        <BrandMark brand={brand} size="lg" />
+      </div>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight">Admin login</h1>
       <Card>
-        <form action={action} className="space-y-4">
-          {state.error && <Alert tone="danger">{state.error}</Alert>}
-          <Field label="Username">
-            <Input name="username" autoComplete="username" defaultValue={state.username} required />
-          </Field>
-          <Field label="Password">
-            <Input name="password" type="password" autoComplete="current-password" required />
-          </Field>
-          <Button type="submit" disabled={pending} className="w-full">
-            {pending ? "Logging in…" : "Log in"}
-          </Button>
-        </form>
+        <AdminLoginForm />
       </Card>
     </main>
   );

@@ -1,8 +1,92 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Alert, Button, Field, Input } from "@/components/ui";
-import { addAllowedIp, registerPendingFaces, saveGraceMinutes, saveSessions, type SettingsState } from "./actions";
+import { Alert, Button, Field, Input, inputClass } from "@/components/ui";
+import { addAllowedIp, registerPendingFaces, saveBranding, saveGraceMinutes, saveSessions, type SettingsState } from "./actions";
+import { contrastRatio, MIN_CONTRAST_ON_WHITE, normalizeHex } from "@/lib/color";
+
+export function BrandingForm({ initial }: { initial: { orgName: string; primaryColor: string; logoUrl: string | null } }) {
+  const [state, action, pending] = useActionState(saveBranding, {});
+  const [color, setColor] = useState(initial.primaryColor);
+  const [preview, setPreview] = useState<string | null>(null);
+  const hex = normalizeHex(color);
+  const ratio = hex ? contrastRatio(hex, "#FFFFFF") : 0;
+  const readable = ratio >= MIN_CONTRAST_ON_WHITE;
+
+  return (
+    <form action={action} className="space-y-4">
+      <Messages state={state} />
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Institution name" hint="Shown in the sidebar, login pages and browser tab.">
+          <Input name="orgName" defaultValue={initial.orgName} minLength={2} maxLength={60} required />
+        </Field>
+        <Field
+          label="Primary colour"
+          hint={hex ? (readable ? `Readable with white text (${ratio.toFixed(1)}:1).` : `Too light for white text (${ratio.toFixed(1)}:1). Choose a darker shade.`) : "Use a hex code like #047857."}
+          error={hex && !readable ? "Too light for white text. Choose a darker shade." : undefined}
+        >
+          <div className="flex gap-2">
+            <input
+              type="color"
+              aria-label="Pick primary colour"
+              value={hex ?? "#047857"}
+              onChange={(e) => setColor(e.target.value.toUpperCase())}
+              className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-border bg-surface p-1"
+            />
+            <Input name="primaryColor" value={color} onChange={(e) => setColor(e.target.value)} className="font-mono uppercase" required />
+          </div>
+        </Field>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Logo" hint="PNG, JPG or WebP, up to 1 MB. Square works best.">
+          <input
+            name="logo"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              setPreview(f ? URL.createObjectURL(f) : null);
+            }}
+            className={`${inputClass} py-1.5`}
+          />
+        </Field>
+        <div className="space-y-2">
+          <span className="text-sm font-medium">Preview</span>
+          <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-background p-3">
+            {preview || initial.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- local preview / our own logo route
+              <img src={preview ?? initial.logoUrl!} alt="Logo preview" className="h-10 w-10 rounded-lg bg-white object-contain" />
+            ) : (
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg text-xs text-white" style={{ background: hex ?? undefined }}>
+                Logo
+              </span>
+            )}
+            <span
+              className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-white"
+              style={{ background: hex ?? undefined }}
+            >
+              Button
+            </span>
+            <span className="text-sm font-medium" style={{ color: hex ?? undefined }}>
+              Link colour
+            </span>
+          </div>
+          {initial.logoUrl && (
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="removeLogo" className="h-4 w-4" />
+              Remove current logo
+            </label>
+          )}
+        </div>
+      </div>
+
+      <Button type="submit" disabled={pending || !hex || !readable}>
+        {pending ? "Saving…" : "Save branding"}
+      </Button>
+    </form>
+  );
+}
 
 export function RegisterPendingFacesForm() {
   const [state, action, pending] = useActionState(registerPendingFaces, {});

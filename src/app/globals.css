@@ -1,37 +1,31 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens. --primary / --primary-hover are set per institution on <html> from Settings
+ * (root layout); everything else is fixed for a consistent, readable product.
+ */
 :root {
-  --background: #f6f7f9;
+  --background: #f8fafc;
   --surface: #ffffff;
-  --foreground: #161a1f;
-  --muted: #5f6b7a;
-  --border: #dde2e8;
-  --primary: #1f5eff;
+  --foreground: #0f172a; /* navy */
+  --muted: #475569;
+  --subtle: #94a3b8;
+  --border: #e2e8f0;
+  --navy: #0f172a;
+  --navy-foreground: #e2e8f0;
+  --primary: #047857; /* emerald (default) */
+  --primary-hover: #04664a;
   --primary-foreground: #ffffff;
-  --success: #12805c;
-  --success-bg: #e3f6ee;
-  --warning: #9a5b00;
-  --warning-bg: #fff1d6;
-  --danger: #c4282d;
-  --danger-bg: #fde8e8;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f1216;
-    --surface: #171b21;
-    --foreground: #e8ebef;
-    --muted: #9aa5b3;
-    --border: #2a313a;
-    --primary: #5b8bff;
-    --primary-foreground: #0b0e12;
-    --success: #4cd39f;
-    --success-bg: #12322a;
-    --warning: #f5b84d;
-    --warning-bg: #3a2c12;
-    --danger: #ff7b7f;
-    --danger-bg: #3d1a1c;
-  }
+  --primary-soft: color-mix(in srgb, var(--primary) 10%, white);
+  --success: #047857;
+  --success-bg: #ecfdf5;
+  --warning: #b45309;
+  --warning-bg: #fffbeb;
+  --danger: #b91c1c;
+  --danger-bg: #fef2f2;
+  --info: #334155;
+  --info-bg: #f1f5f9;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -39,15 +33,22 @@
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
   --color-border: var(--border);
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
   --color-success: var(--success);
   --color-success-bg: var(--success-bg);
   --color-warning: var(--warning);
   --color-warning-bg: var(--warning-bg);
   --color-danger: var(--danger);
   --color-danger-bg: var(--danger-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -55,4 +56,19 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* One visible, consistent keyboard focus style everywhere. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

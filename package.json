@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "tsx --conditions=react-server --test --test-timeout=60000 src/lib/ip.test.ts src/lib/phone.test.ts src/lib/schedule.test.ts src/lib/timezone.test.ts src/lib/face-policy.test.ts src/lib/face-engine.test.mts src/lib/attempts.integration.test.mts",
+    "test": "tsx --conditions=react-server --test --test-timeout=60000 src/lib/ip.test.ts src/lib/phone.test.ts src/lib/schedule.test.ts src/lib/timezone.test.ts src/lib/color.test.ts src/lib/face-policy.test.ts src/lib/face-engine.test.mts src/lib/attempts.integration.test.mts",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
     "setup": "tsx scripts/setup.ts"
@@ -21,6 +21,7 @@
     "cloudinary": "^2.11.0",
     "drizzle-orm": "^0.45.4",
     "ipaddr.js": "^2.5.0",
+    "lucide-react": "1.49.0",
     "next": "16.4.2",
     "pg": "^8.23.1",
     "react": "19.3.0",

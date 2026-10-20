@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ConfirmSubmit } from "@/components/confirm-submit";
-import { Alert, Card, Skeleton } from "@/components/ui";
+import { Palette, Settings as SettingsIcon, ShieldCheck, Wifi, Clock3, Timer } from "lucide-react";
+import { Alert, Card, PageHeader, Skeleton } from "@/components/ui";
+import { getBranding } from "@/lib/branding";
 import { requireAdmin } from "@/lib/auth";
 import { getAllowlist, getGraceMinutes, getSessions } from "@/lib/config";
 import { isIpAllowed } from "@/lib/ip";
@@ -11,14 +13,14 @@ import { removeAllowedIp } from "./actions";
 import { eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { faceConfigStatus } from "@/lib/face";
-import { AddIpForm, GraceForm, RegisterPendingFacesForm, SessionsForm } from "./forms";
+import { AddIpForm, BrandingForm, GraceForm, RegisterPendingFacesForm, SessionsForm } from "./forms";
 
 export const metadata: Metadata = { title: "Settings" };
 
 export default function SettingsPage() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Settings</h1>
+      <PageHeader icon={SettingsIcon} title="Settings" description="Branding, building network, face verification and session times." />
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <Settings />
       </Suspense>
@@ -28,11 +30,12 @@ export default function SettingsPage() {
 
 async function Settings() {
   await requireAdmin();
-  const [allowlist, sessions, graceMinutes, currentIp] = await Promise.all([
+  const [allowlist, sessions, graceMinutes, currentIp, brand] = await Promise.all([
     getAllowlist(),
     getSessions(),
     getGraceMinutes(),
     getClientIp(),
+    getBranding(),
   ]);
   const currentAllowed = currentIp ? isIpAllowed(currentIp, allowlist.map((a) => a.cidr)) : false;
   const face = faceConfigStatus();
@@ -49,8 +52,13 @@ async function Settings() {
   return (
     <div className="space-y-4">
       <Card className="space-y-4">
+        <SectionTitle icon={Palette} title="Branding" text="Your institution's name, logo and colour, shown across the admin and student pages." />
+        <BrandingForm initial={{ orgName: brand.orgName, primaryColor: brand.primaryColor, logoUrl: brand.logoUrl }} />
+      </Card>
+
+      <Card className="space-y-4">
         <div>
-          <h2 className="font-medium">Building network</h2>
+          <h2 className="flex items-center gap-2 font-semibold"><Wifi aria-hidden className="h-4 w-4 text-primary" />Building network</h2>
           <p className="text-sm text-muted">
             Attendance is accepted only from these IPs. Add the building&apos;s static public IP. If the internet provider
             also gives IPv6, add its IPv6 range too (open this page on a phone connected to the Wi-Fi to see it).
@@ -87,7 +95,7 @@ async function Settings() {
 
       <Card className="space-y-3">
         <div>
-          <h2 className="font-medium">Face verification</h2>
+          <h2 className="flex items-center gap-2 font-semibold"><ShieldCheck aria-hidden className="h-4 w-4 text-primary" />Face verification</h2>
           <p className="text-sm text-muted">
             Selfies are compared on this server (face-api, no paid service) with each student&apos;s registered photo.
             Students get 3 counted tries per session; after that, review and mark them from the Today page. A face
@@ -112,7 +120,7 @@ async function Settings() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="font-medium">Attendance sessions</h2>
+        <h2 className="flex items-center gap-2 font-semibold"><Clock3 aria-hidden className="h-4 w-4 text-primary" />Attendance sessions</h2>
         <SessionsForm
           initial={sessions.map((s) => ({
             id: s.id,
@@ -125,7 +133,7 @@ async function Settings() {
 
       <Card className="space-y-4">
         <div>
-          <h2 className="font-medium">Late marking</h2>
+          <h2 className="flex items-center gap-2 font-semibold"><Timer aria-hidden className="h-4 w-4 text-primary" />Late marking</h2>
           <p className="text-sm text-muted">
             Marks within this many minutes of a session starting are &quot;on time&quot;. Later marks in the same session are
             &quot;late&quot;.
@@ -133,6 +141,18 @@ async function Settings() {
         </div>
         <GraceForm graceMinutes={graceMinutes} />
       </Card>
+    </div>
+  );
+}
+
+function SectionTitle({ icon: Icon, title, text }: { icon: typeof Palette; title: string; text: string }) {
+  return (
+    <div>
+      <h2 className="flex items-center gap-2 font-semibold">
+        <Icon aria-hidden className="h-4 w-4 text-primary" />
+        {title}
+      </h2>
+      <p className="text-sm text-muted">{text}</p>
     </div>
   );
 }

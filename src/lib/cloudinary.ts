@@ -52,6 +52,18 @@ export async function fetchPrivateImage(publicId: string): Promise<Uint8Array> {
   return new Uint8Array(await res.arrayBuffer());
 }
 
+/** Server-side only: signed PNG URL for the institution logo (keeps transparency). */
+export function logoSignedUrl(publicId: string): string {
+  return client().url(publicId, {
+    type: "authenticated",
+    resource_type: "image",
+    sign_url: true,
+    secure: true,
+    format: "png",
+    transformation: [{ width: 512, height: 512, crop: "limit" }],
+  });
+}
+
 export type MediaSize = "thumb" | "full";
 
 /**

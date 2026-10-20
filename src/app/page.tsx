@@ -9,13 +9,16 @@ import { CONSENT_NOTICE, hasActiveConsent } from "@/lib/consent";
 import { getActiveEnrollment } from "@/lib/enrollment";
 import { faceConfigStatus } from "@/lib/face";
 import { buildingFormat } from "@/lib/timezone";
+import { LogOut } from "lucide-react";
+import { BrandMark } from "@/components/brand";
+import { getBranding } from "@/lib/branding";
 import { acceptConsent, revokeConsent } from "./attendance-actions";
 import { AttendanceFlow } from "./attendance-flow";
 import { studentLogout } from "./login/actions";
 
 export default function StudentHomePage() {
   return (
-    <main className="mx-auto w-full max-w-md flex-1 px-4 py-6">
+    <main id="main" className="mx-auto w-full max-w-md flex-1 px-4 py-6">
       <Suspense fallback={<HomeSkeleton />}>
         <StudentHome />
       </Suspense>
@@ -31,11 +34,12 @@ const badgeOf = (r: Rec) => (r.state === "absent" || !r.status ? "absent" : r.st
 
 async function StudentHome() {
   const student = await requireStudent();
-  const [today, consented, enrollment, history] = await Promise.all([
+  const [today, consented, enrollment, history, brand] = await Promise.all([
     getStudentToday(student.id),
     hasActiveConsent(student.id),
     getActiveEnrollment(student.id),
     getStudentHistory(student.id),
+    getBranding(),
   ]);
   const { active, record } = today;
   const verification = faceConfigStatus();
@@ -43,16 +47,20 @@ async function StudentHome() {
 
   return (
     <div className="space-y-5">
-      <header className="flex items-center justify-between gap-3">
+      <header className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <BrandMark brand={brand} />
+          <form action={studentLogout}>
+            <Button variant="secondary" type="submit" className="h-9 px-3">
+              <LogOut aria-hidden className="h-4 w-4" />
+              Log out
+            </Button>
+          </form>
+        </div>
         <div>
           <p className="text-sm text-muted">Welcome</p>
-          <h1 className="text-xl font-semibold">{student.name}</h1>
+          <h1 className="text-xl font-semibold tracking-tight">{student.name}</h1>
         </div>
-        <form action={studentLogout}>
-          <Button variant="secondary" type="submit">
-            Log out
-          </Button>
-        </form>
       </header>
 
       <section aria-label="Today's sessions" className="space-y-2">

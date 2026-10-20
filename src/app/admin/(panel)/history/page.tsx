@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { asc } from "drizzle-orm";
-import { Alert, buttonClass, Card, Field, Input, inputClass, Skeleton, StatusBadge } from "@/components/ui";
+import { BarChart3, Download, SearchX } from "lucide-react";
+import { Alert, buttonClass, Card, EmptyState, Field, Input, inputClass, PageHeader, Skeleton, StatusBadge } from "@/components/ui";
 import { db, schema } from "@/db";
 import { requireAdmin } from "@/lib/auth";
 import { parseHistoryFilters } from "@/lib/history-params";
@@ -17,7 +18,7 @@ const dateTime = buildingFormat({ day: "numeric", month: "short", hour: "numeric
 export default function HistoryPage(props: PageProps<"/admin/history">) {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">History</h1>
+      <PageHeader icon={BarChart3} title="History" description="Attendance by date and student. Download a CSV for any range up to 62 days." />
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <History searchParams={props.searchParams} />
       </Suspense>
@@ -89,13 +90,14 @@ async function History({ searchParams }: Pick<PageProps<"/admin/history">, "sear
           <span className="text-danger">{totals.absent} absent</span>
         </p>
         <a href={`/api/admin/export?${exportQuery}`} className={buttonClass("secondary")}>
+          <Download aria-hidden className="h-4 w-4" />
           Download CSV
         </a>
       </div>
 
       <Card className="overflow-x-auto p-0 sm:p-0">
         {rows.length === 0 ? (
-          <p className="p-8 text-center text-sm text-muted">No records for these filters.</p>
+          <EmptyState icon={SearchX}>No records for these filters.</EmptyState>
         ) : (
           <table className="w-full min-w-[640px] text-sm">
             <thead className="border-b border-border text-left text-xs text-muted">
