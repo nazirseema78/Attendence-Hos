@@ -62,9 +62,9 @@ This app stores sensitive personal data: ID cards, faces, phone numbers, and lik
 - [x] **Network**: the building has a **static public IP**. The admin manages the allowlist in Settings.
 - [x] **Location** (2026-10-20): the hostel is in **Pakistan**. Building time zone `Asia/Karachi` (env `NEXT_PUBLIC_BUILDING_TIMEZONE`), phones default to +92. An earlier version wrongly assumed India (IST).
 - [x] **Schedule**: three fixed sessions covering the whole day, editable by the admin. Times are wall-clock times in the building zone:
-  - Session 1: 08:00–14:30
+  - Session 1: 08:30–14:30 (changed 2026-10-20 so the night session can end at 08:30)
   - Session 2: 14:30–21:00
-  - Session 3: 21:00–08:00 next day. **It crosses midnight**: an attempt at 02:00 belongs to the session that started at 21:00 the *previous* date. Store a `session_date` = the date the session started.
+  - Session 3: 21:00–08:30 next day. **It crosses midnight**: an attempt at 02:00 belongs to the session that started at 21:00 the *previous* date. Store a `session_date` = the date the session started.
   - Sessions must not overlap. Validate this when the admin edits them.
   - One accepted record per student, per session, per `session_date`.
 - [x] **Late marking**: allowed. A mark made within the **grace period** (admin setting, default 30 min) from the session start is `on_time`; anything later in the session is `late`. A student who never marks is `absent`. A session can be marked only while it is open.

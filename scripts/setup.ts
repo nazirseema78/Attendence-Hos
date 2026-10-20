@@ -16,9 +16,9 @@ import * as schema from "../src/db/schema";
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 const DEFAULT_SESSIONS = [
-  { name: "Session 1", startMinute: 8 * 60, endMinute: 14 * 60 + 30 },
+  { name: "Session 1", startMinute: 8 * 60 + 30, endMinute: 14 * 60 + 30 },
   { name: "Session 2", startMinute: 14 * 60 + 30, endMinute: 21 * 60 },
-  { name: "Session 3", startMinute: 21 * 60, endMinute: 8 * 60 },
+  { name: "Session 3", startMinute: 21 * 60, endMinute: 8 * 60 + 30 },
 ];
 
 async function main() {
@@ -34,7 +34,7 @@ async function main() {
   const [{ n }] = await db.select({ n: count() }).from(schema.attendanceSessions);
   if (n === 0) {
     await db.insert(schema.attendanceSessions).values(DEFAULT_SESSIONS);
-    console.log("• Added default sessions: 8:00–14:30, 14:30–21:00, 21:00–08:00");
+    console.log("• Added default sessions: 8:30–14:30, 14:30–21:00, 21:00–08:30");
   }
   await db.insert(schema.settings).values({ id: 1, graceMinutes: 30 }).onConflictDoNothing();
 
